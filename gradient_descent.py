@@ -1,108 +1,78 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import threading
 from tqdm import tqdm
+from sklearn.datasets import make_blobs
+
+# generate 2d classification dataset
+X, y = make_blobs(n_samples=100, centers=5, n_features=2)
 
 # read data from csv file
 
-data = pd.read_csv("data.csv").dropna().reset_index()
+# data = pd.read_csv("data.csv").dropna().reset_index()
 
-## split data into training and testing sets withouth using sklearn
+data = pd.DataFrame({'x': X[:, 0], 'y': X[:, 1]}).dropna().reset_index()
+
+entry_points = len(data.iloc[:, 0].values.reshape(-1, 1))
+
+learning_rate = 0.001
+
+iterations = 1000
+
+print("Entery points: ", entry_points)
 
 # shuffle data
 
-data = data.sample(frac=1).reset_index(drop=True)
+# data = data.sample(frac=1).reset_index(drop=True)
 
-# split data into training and testing sets
+w = np.random.uniform(low=-0.01, high=0.01, size=(entry_points,))
+b = np.random.uniform(low=-0.01, high=0.01, size=(entry_points,))
 
-train_data = data.iloc[:int(0.8 * len(data))]
+def get_predictions(w, b, x):
+    return w * x + b
 
-test_data = data.iloc[int(0.8 * len(data)):]
 
-# gradient descent
+def compute_gradients(local_w, local_b, l_data, total_points):
+    gw = 0
+    gb = 0
 
-# initialize parameters
+    for i in range(total_points):
 
-theta = np.random.randn(1, 1)
+        x = l_data.iloc[i].x
+        y = l_data.iloc[i].y
 
-# initialize hyperparameters
+        y_hat = get_predictions(local_w, local_b, x)
 
-alpha = 0.01
+        gw += (-2 / total_points) * x * (y - y_hat)
+        gb += (-2 / total_points) * (y - y_hat)
 
-iterations = 10000
+    return gw, gb
 
-# define gradient descent function
+def update_parameters(l_data, total_points, learning_rate):
+    global w, b
 
-def gradient_descent(X, y, theta, alpha, iterations):
-    m = len(y)
+    gw, gb = compute_gradients(w, b, l_data, total_points)
+
+    w = w - learning_rate * gw
+    b = b - learning_rate * gb
+
+
+def train(l_data, total_points, iterations, learning_rate):
     for i in tqdm(range(iterations)):
-        y_pred = X.dot(theta)
-        theta = theta - (1 / m) * alpha * (X.T.dot((y_pred - y)))
-    return theta
+        update_parameters(l_data, total_points, learning_rate)
 
-# define function to train model
+w.reshape(-1, 1)
 
-def train_model(X, y, alpha, iterations):
+def predict(x):
+    return w * x + b
 
-    global theta 
-
-    theta= gradient_descent(X, y, theta, alpha, iterations)
-
-    return theta
-
-# train model
-
-X = train_data['x'].values.reshape(-1, 1)
-y = train_data['y'].values.reshape(-1, 1)
-
-
-theta = train_model(X, y, alpha, iterations)
-
-
-# plot model
-
-def plot_model():
-    plt.figure(figsize=(8,6))
-    plt.scatter(x=train_data['x'], y=train_data['y'], cmap='Set1', s=50)
-    plt.plot(train_data['x'], theta[0]*train_data['x'], 'r')
-    plt.xlabel('x')
-    plt.ylabel('y')
-    plt.title('Model')
+def plot():
+    plt.scatter(data['x'], data['y'])
+    plt.plot(data['x'], predict(data['x']), color='red')
     plt.show()
 
-plot_model()
+train(data, entry_points, iterations, learning_rate)
 
-# predict values
+print(w)
 
-X_test = test_data['x'].values.reshape(-1,1)
-y_test = test_data['y'].values.reshape(-1,1)
-
-y_pred = X_test.dot(theta)
-
-# plot predictions
-
-def plot_predictions():
-    plt.figure(figsize=(8,6))
-    plt.scatter(x=test_data['x'], y=test_data['y'], cmap='Set1', s=50)
-    plt.scatter(x=test_data['x'], y=y_pred, cmap='Set1', s=50)
-    plt.xlabel('x')
-    plt.ylabel('y')
-    plt.title('Predictions')
-    plt.show()
-
-plot_predictions()
-
-
-
-# if "name" == "__main__":
-
-#     mthread = threading.Thread(target=plot_model)
-#     mthread.start()
-
-#     mthread2 = threading.Thread(target=plot_predictions)
-#     mthread2.start()
-
-#     mthread.join()
-#     mthread2.join()
-
+plot()

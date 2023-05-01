@@ -4,7 +4,7 @@ The linear regression model of a milti-variate n-dimensional feature vector. Imp
 # Results
 
 ## Tensorflow results
-[Tensorflow](https://github.com/AbduEhab/multi-variate-linear-regression/blob/main/FIgures/Tensorflow%20regression.png)
+![Tensorflow](https://github.com/AbduEhab/multi-variate-linear-regression/blob/main/FIgures/Tensorflow%20regression.png)
 
 ## All algorithms results
-[All tests](https://github.com/AbduEhab/multi-variate-linear-regression/blob/main/FIgures/ALL_TESTS.png)
+![All tests](https://github.com/AbduEhab/multi-variate-linear-regression/blob/main/FIgures/ALL_TESTS.png)

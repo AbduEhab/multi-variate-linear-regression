@@ -3,7 +3,7 @@ The linear regression model of a milti-variate n-dimensional feature vector. Imp
 
 Each run will generate a different dataset.
 
-> Note: sometimes the sqrt method breaks as it fails to find a solution to the given dataset. Please re-run the main file again to generate a new set.
+> Note: sometimes the sqrt method breaks as it fails to find a solution to the given dataset. Please re-run the main file to generate a new set.
 
 # Results
 
